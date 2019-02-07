@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>S448087-ActiveStoriesByTeam</title>
+
+    <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
+
+    <script type="text/javascript">
+        Rally.onReady(function () {
+                Ext.define("CustomApp",{extend:"Rally.app.App",componentCls:"app",_projectId:void 0,_mapProjects:void 0,items:[{xtype:"container",itemId:"header",cls:"header"},{xtype:"container",itemId:"bodyContainer",width:"100%",autoScroll:!0}],launch:function(){var e=this.getContext().getProject().ObjectID;this._projectId=e,console.log("Project:",this._projectId);Ext.create("Rally.data.wsapi.artifact.Store",{models:["HierarchicalRequirement"],fetch:["Name","FormattedID","Blocked","ScheduleState","Owner","Project"],limit:1/0,context:{project:"/project/"+this._projectId,projectScopeUp:!1,projectScopeDown:!0},filters:[{property:"Blocked",operator:"=",value:!1}],sorters:[{property:"FormattedID",direction:"ASC"}]}).load().then({success:function(e){console.log("records",e),this._mapProjects=new Ext.util.MixedCollection,_.each(e,function(e){var t=e.get("Project");this._mapProjects.containsKey(t.Name)?this._mapProjects.get(t.Name).push(e):(artifacts=[],artifacts.push(e),this._mapProjects.add(t.Name,artifacts))},this),console.log("projects",this._mapProjects);var t=[];this._mapProjects.eachKey(function(e,o){var a=new Ext.util.MixedCollection;_.each(o,function(e){var t=e.get("Owner");if(t){var o=t._refObjectName;if(a.containsKey(o))a.get(o).push(e);else{var r=[];r.push(e),a.add(o,r)}}},this),t.push(a)},this),console.log(t),this.down("#bodyContainer").removeAll(!0),this._addPanel(t)},scope:this})},_addPanel:function(e){var t=Ext.create("Ext.container.Container",{layout:{type:"hbox",align:"stretch",padding:5},width:"100%",autoScroll:!0});this.down("#bodyContainer").add(t),_.each(e,function(e){var o=e.first()[0].get("Project").Name;console.log(o);var a=this._createStore(e),r=this._createGrid(a);console.log("store",a.getCount());var i=Ext.create("Ext.panel.Panel",{title:o,autoScroll:!0,width:300,layout:{type:"vbox",align:"stretch",padding:5},padding:5,items:[r]});t.add(i)},this)},_createGrid:function(e){return console.log("creating grid for:",e),Ext.create("Rally.ui.grid.Grid",{viewConfig:{stripeRows:!0,enableTextSelection:!0},showRowActionsColumn:!1,showPagingToolbar:!1,enableEditing:!1,itemId:"iterationScoreGrid",store:e,columnCfgs:[{text:"Name",dataIndex:"name",flex:3},{text:"Stories In Progress",dataIndex:"count",flex:2}]})},_createStore:function(e){var t=[];e.eachKey(function(e,o){var a=0;_.each(o,function(e){var t=e.get("ScheduleState");"Defined"!==t&&"In-Progress"!==t||(a+=1)},this),a>1&&t.push({name:e,count:a})},this);var o=Ext.create("Ext.data.JsonStore",{fields:["name","count"]});return o.loadData(t),o}});
+
+            Rally.launchApp('CustomApp', {
+                name:"S448087-ActiveStoriesByTeam",
+                parentRepos:"",
+                version:"0.1.1"
+            });
+
+        });
+    </script>
+
+
+    <style type="text/css">
+        
+    </style>
+</head>
+<body>
+</body>
+</html>
